@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -25,8 +26,13 @@ public class CandidatosImpl implements CandidatoService{
     @Override
     public ResponseEntity<?> create(Candidatos candidatos) {
         try{
-            repository.save(candidatos);
-            return new ResponseEntity<>("Cadastro Feito Com Sucesso!", HttpStatus.CREATED);
+            if (Objects.nonNull(candidatos)) {
+                repository.save(candidatos);
+                return new ResponseEntity<>("Cadastro Feito Com Sucesso!", HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("Por favor,preencha o(s) campo(s)!", HttpStatus.BAD_REQUEST);
+            }
+
         }catch (Exception e){
             logger.error("Ocorreu um erro no cadastro do candidato", e.getCause());
         }
@@ -38,14 +44,18 @@ public class CandidatosImpl implements CandidatoService{
         try{
             Candidatos candidatoInDB = repository.findById(id).get();
             if(isCandidatoExists(id).getStatusCodeValue() != HttpStatus.NOT_FOUND.value()){
-                candidatoInDB.setCurriculumVitae(candidatos.getCurriculumVitae());
-                candidatoInDB.setNome(candidatos.getNome());
-                candidatoInDB.setEmail(candidatos.getEmail());
-                candidatoInDB.setPerfil(candidatos.getPerfil());
-                candidatoInDB.setPretensaoSalarial(candidatos.getPretensaoSalarial());
-                candidatoInDB.setTecnologias(candidatos.getTecnologias());
-                repository.save(candidatoInDB);
-                return new ResponseEntity<>("Atualização feita com sucesso! ", HttpStatus.CREATED);
+                if(Objects.nonNull(candidatos)){
+                    candidatoInDB.setCurriculumVitae(candidatos.getCurriculumVitae());
+                    candidatoInDB.setNome(candidatos.getNome());
+                    candidatoInDB.setEmail(candidatos.getEmail());
+                    candidatoInDB.setPerfil(candidatos.getPerfil());
+                    candidatoInDB.setPretensaoSalarial(candidatos.getPretensaoSalarial());
+                    candidatoInDB.setTecnologias(candidatos.getTecnologias());
+                    repository.save(candidatoInDB);
+                    return new ResponseEntity<>("Atualização feita com sucesso! ", HttpStatus.CREATED);
+                }else{
+                    return new ResponseEntity<>("Por favor,preencha o(s) campo(s)!", HttpStatus.BAD_REQUEST);
+                }
             }
         }catch (Exception e){
             logger.error("Ocorreu uma excepção ao atualizar o candidato ", e.getCause());;
