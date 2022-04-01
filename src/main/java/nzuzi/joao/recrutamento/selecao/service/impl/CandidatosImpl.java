@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +31,7 @@ public class CandidatosImpl implements CandidatoService{
                 repository.save(candidatos);
                 return new ResponseEntity<>("Cadastro Feito Com Sucesso!", HttpStatus.CREATED);
             } else {
-                return new ResponseEntity<>("Por favor,preencha o(s) campo(s)!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Por favor, preencha o(s) campo(s)!", HttpStatus.BAD_REQUEST);
             }
 
         }catch (Exception e){
@@ -42,20 +43,24 @@ public class CandidatosImpl implements CandidatoService{
     @Override
     public ResponseEntity<?> update(Candidatos candidatos, Long id){
         try{
-            Candidatos candidatoInDB = repository.findById(id).get();
-            if(isCandidatoExists(id).getStatusCodeValue() != HttpStatus.NOT_FOUND.value()){
-                if(Objects.nonNull(candidatos)){
-                    candidatoInDB.setCurriculumVitae(candidatos.getCurriculumVitae());
-                    candidatoInDB.setNome(candidatos.getNome());
-                    candidatoInDB.setEmail(candidatos.getEmail());
-                    candidatoInDB.setPerfil(candidatos.getPerfil());
-                    candidatoInDB.setPretensaoSalarial(candidatos.getPretensaoSalarial());
-                    candidatoInDB.setTecnologias(candidatos.getTecnologias());
-                    repository.save(candidatoInDB);
-                    return new ResponseEntity<>("Atualização feita com sucesso! ", HttpStatus.CREATED);
-                }else{
-                    return new ResponseEntity<>("Por favor,preencha o(s) campo(s)!", HttpStatus.BAD_REQUEST);
+            if (Objects.nonNull(id) || id.toString().isEmpty()) {
+                Candidatos candidatoInDB = repository.findById(id).get();
+                if(isCandidatoExists(id).getStatusCodeValue() != HttpStatus.NOT_FOUND.value()){
+                    if(Objects.nonNull(candidatos)){
+                        candidatoInDB.setCurriculumVitae(candidatos.getCurriculumVitae());
+                        candidatoInDB.setNome(candidatos.getNome());
+                        candidatoInDB.setEmail(candidatos.getEmail());
+                        candidatoInDB.setPerfil(candidatos.getPerfil());
+                        candidatoInDB.setPretensaoSalarial(candidatos.getPretensaoSalarial());
+                        candidatoInDB.setTecnologias(candidatos.getTecnologias());
+                        repository.save(candidatoInDB);
+                        return new ResponseEntity<>("Atualização feita com sucesso! ", HttpStatus.CREATED);
+                    }else{
+                        return new ResponseEntity<>("Por favor, preencha o(s) campo(s)!", HttpStatus.BAD_REQUEST);
+                    }
                 }
+            } else {
+                return new ResponseEntity<>("Por favor, informa o id do candidato que pretende atualizar!", HttpStatus.BAD_REQUEST);
             }
         }catch (Exception e){
             logger.error("Ocorreu uma excepção ao atualizar o candidato ", e.getCause());;
@@ -79,9 +84,13 @@ public class CandidatosImpl implements CandidatoService{
     @Override
     public ResponseEntity<?> findCandidatoByName(String nome) {
         try{
-            return repository.getCandidatoPorNome(nome).isPresent()
-                    ? ResponseEntity.ok().body(repository.getCandidatoPorNome(nome))
-                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Candidato(s) Com Nome ".concat(nome));
+            if(nome.isEmpty() || Objects.isNull(nome)){
+                return new ResponseEntity<>("Por favor, informa o nome do candidato encontrar!", HttpStatus.BAD_REQUEST);
+            }else {
+                return repository.getCandidatoPorNome(nome).isPresent()
+                        ? ResponseEntity.ok().body(repository.getCandidatoPorNome(nome))
+                        : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Candidato(s) Com Nome ".concat(nome));
+            }
         }catch (Exception e){
             logger.error("Ocorreu um erro ao pesquisar os candidatos", e.getCause());
         }
@@ -91,9 +100,13 @@ public class CandidatosImpl implements CandidatoService{
     @Override
     public ResponseEntity<?> findCandidatoByPerfil(String perfil) {
         try{
-            return repository.getCandidatosPorPerfil(perfil).isPresent()
-                    ? ResponseEntity.ok().body(repository.getCandidatosPorPerfil(perfil))
-                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Candidato(s) Com Perfil ".concat(perfil));
+            if(perfil.isEmpty() || Objects.isNull(perfil)){
+                return new ResponseEntity<>("Por favor, informa o perfil do candidato que deseja!", HttpStatus.BAD_REQUEST);
+            }else {
+                return repository.getCandidatosPorPerfil(perfil).isPresent()
+                        ? ResponseEntity.ok().body(repository.getCandidatosPorPerfil(perfil))
+                        : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Candidato(s) Com Perfil ".concat(perfil));
+            }
         }catch (Exception e){
             logger.error("Ocorreu um erro ao pesquisar os candidatos", e.getCause());
         }
@@ -103,12 +116,16 @@ public class CandidatosImpl implements CandidatoService{
     @Override
     public ResponseEntity<?> findCandidatoPorFaixaSalarial(Double faixaSalarialMenor, Double faixaSalarialMaior) {
         try{
-            return repository.getCandidatosPorPretensaoSalarial(faixaSalarialMenor, faixaSalarialMaior).isPresent()
-                    ? ResponseEntity.ok().body(repository.getCandidatosPorPretensaoSalarial(faixaSalarialMenor, faixaSalarialMaior))
-                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Candidato(s) Com a Pretensão Salarial na Faixa de "
+            if(faixaSalarialMenor.toString().isEmpty() || faixaSalarialMaior.toString().isEmpty()){
+                return new ResponseEntity<>("Por favor, informa a faixa salarial que deseja!", HttpStatus.BAD_REQUEST);
+            }else {
+                return repository.getCandidatosPorPretensaoSalarial(faixaSalarialMenor, faixaSalarialMaior).isPresent()
+                        ? ResponseEntity.ok().body(repository.getCandidatosPorPretensaoSalarial(faixaSalarialMenor, faixaSalarialMaior))
+                        : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Candidato(s) Com a Pretensão Salarial na Faixa de "
                         .concat(String.valueOf(faixaSalarialMenor))
                         .concat(", ")
                         .concat(String.valueOf(faixaSalarialMaior)));
+            }
         }catch (Exception e){
             logger.error("Ocorreu um erro ao pesquisar os candidatos", e.getCause());
         }
@@ -117,10 +134,14 @@ public class CandidatosImpl implements CandidatoService{
 
     private ResponseEntity<?> isCandidatoExists(Long id){
         try{
-            Optional<Optional<Candidatos>> candidatoExistente = Optional.ofNullable(repository.findById(id));
-            return candidatoExistente.isPresent()
-                    ? ResponseEntity.status(HttpStatus.OK).body(candidatoExistente)
-                    : new ResponseEntity<>("Candidato Não Encontrado ", HttpStatus.NOT_FOUND);
+            if(id.equals(null)){
+                return new ResponseEntity<>("Por favor, informa o id do candidato!", HttpStatus.BAD_REQUEST);
+            }else {
+                Optional<Optional<Candidatos>> candidatoExistente = Optional.ofNullable(repository.findById(id));
+                return candidatoExistente.isPresent()
+                        ? ResponseEntity.status(HttpStatus.OK).body(candidatoExistente)
+                        : new ResponseEntity<>("Candidato Não Encontrado ", HttpStatus.NOT_FOUND);
+            }
         }catch (Exception e){
             logger.error("Ocorreu uma exceção ", e.getCause());
         }
