@@ -1,13 +1,15 @@
 package nzuzi.joao.recrutamento.selecao.service;
 
 import nzuzi.joao.recrutamento.selecao.entity.Vagas;
-import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface VagaService {
 
-    ResponseEntity<?> create(Vagas vaga);
-    ResponseEntity<?> findAll();
-    ResponseEntity<?> findTitulo(String titulo);
-    ResponseEntity<?> findTipoVaga(String tipoVaga);
-    ResponseEntity<?> update(Long id, Vagas vaga);
+    Vagas create(Vagas vaga);
+    List<Vagas> findAll();
+    Optional<Vagas> findTitulo(String titulo);
+    Optional<Vagas> findTipoVaga(String tipoVaga);
+    Vagas update(Long id, Vagas vaga);
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +28,9 @@ public class TecnologiasImpl implements TecnologiasService {
             repository.save(tecnologia);
             return new ResponseEntity<>("Cadastro Feito Com Sucesso!", HttpStatus.CREATED);
         }catch (Exception e){
-            logger.error("Ocorreu um erro ao cadastrar a Tecnologia", e.getCause());
+            logger.error("Ocorreu um erro ao cadastrar a Tecnologia");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ocorreu um erro ao cadastrar a Tecnologia!");
         }
-        return null;
     }
 
     @Override
@@ -40,9 +41,9 @@ public class TecnologiasImpl implements TecnologiasService {
                     ? ResponseEntity.ok().body(todasTecnologias)
                     : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Tecnologias(s) Cadastrado(s)");
         }catch (Exception e){
-            logger.error("Ocorreu um erro a pesquisar as Tecnologias", e.getCause());
+            logger.error("Ocorreu um erro ao pesquisar as Tecnologias", e.getCause());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ocorreu um erro ao pesquisar as Tecnologias!");
         }
-        return null;
     }
 
 
@@ -56,7 +57,8 @@ public class TecnologiasImpl implements TecnologiasService {
                 return ResponseEntity.status(HttpStatus.CREATED).body("Atualização feita com sucesso!");
             }
         }catch (Exception e){
-            logger.error("Ocorreu uma excepção ao atualizar a tecnologia ", e.getCause());;
+            logger.error("Ocorreu uma exceção ao atualizar a tecnologia ", e.getCause());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ocorreu uma exceção ao atualizar a tecnologia!");
         }
         return null;
     }
@@ -69,19 +71,19 @@ public class TecnologiasImpl implements TecnologiasService {
                     : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tecnologia Não Encontrada!");
         }catch (Exception e){
             logger.error("Ocorreu uma exceção ", e.getCause());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ocorreu uma exceção!");
         }
-        return null;
     }
 
     @Override
     public ResponseEntity<?> findByName(String nome) {
         try{
-            return repository.getTecnologiasByDescricao(nome).isPresent()
-                    ? ResponseEntity.ok().body(repository.getTecnologiasByDescricao(nome))
+            return repository.getTecnologiasByDescricaoLike(nome).isPresent()
+                    ? ResponseEntity.ok().body(repository.getTecnologiasByDescricaoLike(nome))
                     : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não Existe(m) Tecnologia(s) Com Nome ".concat(nome));
         }catch (Exception e){
             logger.error("Ocorreu um erro ao pesquisar a(s) Tecnologia(s)", e.getCause());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ocorreu um erro ao pesquisar a(s) Tecnologia(s)!");
         }
-        return null;
     }
 }

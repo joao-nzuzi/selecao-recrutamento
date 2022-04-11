@@ -1,5 +1,6 @@
 package nzuzi.joao.recrutamento.selecao.controller;
 
+import lombok.val;
 import nzuzi.joao.recrutamento.selecao.entity.Tecnologias;
 import nzuzi.joao.recrutamento.selecao.service.TecnologiasService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,14 @@ public class TecnologiasController {
 
     @GetMapping("/")
     public ResponseEntity<?> getAll(){
-        return service.findAll();
+        try{
+            val teste =  service.findAll();
+            System.out.println("Retorno do teste ".concat(String.valueOf(teste)));
+            return service.findAll();
+        }catch (Exception e){
+            System.out.println(e.getCause());
+        }
+        return null;
     }
 
     @GetMapping("/find_by_name/")

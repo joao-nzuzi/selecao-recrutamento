@@ -1,15 +1,15 @@
 package nzuzi.joao.recrutamento.selecao.service.impl;
 
 import nzuzi.joao.recrutamento.selecao.service.FileStorageService;
-import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -36,7 +36,7 @@ public class FileStoreServiceImpl implements FileStorageService {
                 new File(path).mkdirs();
             }
         } catch (Exception e) {
-            logger.error("Diretório não existe.", e);
+            logger.error("Diretório não existe", e.getCause());
         }
     }
 
@@ -46,7 +46,8 @@ public class FileStoreServiceImpl implements FileStorageService {
         } catch (FileAlreadyExistsException fileAlreadyExistsException) {
             logger.info(String.valueOf(fileAlreadyExistsException));
         } catch (Exception e) {
-            logger.error("Ocorreu um erro ao fazer upload do ficheiro. Erro: ".concat(e.getMessage()));
+            logger.error("Ocorreu um erro ao fazer upload do ficheiro", e.getCause());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ocorreu um erro ao fazer upload do ficheiro!");
         }
     }
 
@@ -70,7 +71,7 @@ public class FileStoreServiceImpl implements FileStorageService {
         try {
             return Files.walk(Paths.get(this.ROOT_PATH), 1).filter(path -> !path.equals(this.ROOT_PATH)).map(Paths.get(this.ROOT_PATH)::relativize);
         } catch (IOException e) {
-            throw new RuntimeException("Não foi possível carregar o ficheiro!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível carregar o ficheiro!");
         }
     }
 
@@ -82,7 +83,7 @@ public class FileStoreServiceImpl implements FileStorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new RuntimeException("Não foi possível ler o ficheiro!");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível ler o ficheiro!");
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Erro: ".concat(e.getMessage()));
