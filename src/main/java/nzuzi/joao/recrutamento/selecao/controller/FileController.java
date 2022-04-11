@@ -20,15 +20,21 @@ public class FileController {
 
     @Autowired
     FileStorageService service;
+    ResponseEntity<String> retorno;
 
     @PostMapping("/")
     public ResponseEntity<?> uploadFile(@RequestParam("ficheiro") MultipartFile file){
         try {
-            service.upload(file);
-            return ResponseEntity.status(HttpStatus.OK).body("Ficheiro ".concat(file.getOriginalFilename().concat(" Salvo Com Sucesso!")));
+            if(file.isEmpty()){
+                retorno = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Por favor, informa o ficheiro que pretende carregar");
+            }else{
+                service.upload(file);
+                return ResponseEntity.status(HttpStatus.OK).body("Ficheiro ".concat(file.getOriginalFilename().concat(" Salvo Com Sucesso!")));
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Ocorreu um erro a fazer upload do ficheiro: ".concat(file.getOriginalFilename()).concat("!"));
         }
+        return retorno;
     }
 
     @GetMapping("/files")
