@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -26,6 +27,11 @@ public class Tecnologias implements Serializable {
     @Column(columnDefinition = "TEXT", name = "descricao", nullable = false)
     private String descricao;
 
-    @ManyToMany(mappedBy = "tecnologias")
-    Set<Candidatos> habilidades;
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "tecnologias")
+    Set<Candidatos> candidatos = new HashSet<>();
 }

@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -31,10 +32,14 @@ public class Candidatos implements Serializable{
     private String curriculumVitae;
     @Column(name = "data_registo")
     private LocalDateTime dataRegisto;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY,
+    cascade = {
+        CascadeType.PERSIST,
+                CascadeType.MERGE
+    })
     @JoinTable(
             name = "candidatos_tecnologias",
-            joinColumns = @JoinColumn(name = "candidato_id"),
-            inverseJoinColumns = @JoinColumn(name = "tecnologias_id"))
-    Set<Tecnologias> tecnologias;
+            joinColumns = { @JoinColumn(name = "candidato_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tecnologias_id")})
+    Set<Tecnologias> tecnologias = new HashSet<>();
 }

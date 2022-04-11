@@ -1,14 +1,16 @@
 package nzuzi.joao.recrutamento.selecao.service;
 
 import nzuzi.joao.recrutamento.selecao.entity.Candidatos;
-import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface CandidatoService {
 
-    ResponseEntity<?> create(Candidatos candidatos);
-    ResponseEntity<?> update(Candidatos candidatos, Long id);
-    ResponseEntity<?> findAll();
-    ResponseEntity<?> findCandidatoByName(String nome);
-    ResponseEntity<?> findCandidatoByPerfil(String perfil);
-    ResponseEntity<?> findCandidatoPorFaixaSalarial(Double faixaSalarialMenor, Double faixaSalarialMaior);
+    Candidatos create(Candidatos candidatos);
+    Candidatos update(Candidatos candidatos, Long id);
+    List<Candidatos> findAll();
+    Optional<Candidatos> findCandidatoByName(String nome);
+    Optional<Candidatos> findCandidatoByPerfil(String perfil);
+    Optional<Candidatos> findCandidatoPorFaixaSalarial(Double faixaSalarialMenor, Double faixaSalarialMaior);
 }
